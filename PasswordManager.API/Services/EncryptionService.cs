@@ -18,7 +18,6 @@ namespace PasswordManager.API.Services
             var keyString = _configuration["Encryption:Key"]!;
             var keyBytes = Encoding.UTF8.GetBytes(keyString);
 
-            // Upewnij się, że klucz ma dokładnie 32 bajty (256 bitów)
             var validKey = new byte[32];
 
             if (keyBytes.Length >= 32)
@@ -28,7 +27,6 @@ namespace PasswordManager.API.Services
             else
             {
                 Array.Copy(keyBytes, validKey, keyBytes.Length);
-                // Wypełnij resztę zerami
                 for (int i = keyBytes.Length; i < 32; i++)
                 {
                     validKey[i] = 0;
@@ -53,7 +51,6 @@ namespace PasswordManager.API.Services
             var plainBytes = Encoding.UTF8.GetBytes(plainText);
             var encryptedBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
 
-            // Połącz IV z zaszyfrowanymi danymi
             var result = new byte[aes.IV.Length + encryptedBytes.Length];
             Array.Copy(aes.IV, 0, result, 0, aes.IV.Length);
             Array.Copy(encryptedBytes, 0, result, aes.IV.Length, encryptedBytes.Length);
@@ -74,7 +71,6 @@ namespace PasswordManager.API.Services
                 using var aes = Aes.Create();
                 aes.Key = key;
 
-                // Wyodrębnij IV (pierwsze 16 bajtów)
                 var iv = new byte[16];
                 var cipher = new byte[fullCipher.Length - 16];
 
