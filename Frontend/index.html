@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-btn:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .tab-btn:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        .password-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .search-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-results-info {
+            margin-top: 15px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .password-item {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .password-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .password-item.hidden {
+            display: none;
+        }
+
+        .password-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .password-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .password-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .password-details {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .password-details div {
+            margin-bottom: 5px;
+        }
+
+        .password-value {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #e1e1e1;
+            margin-top: 15px;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .password-value strong {
+            color: #dc3545;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .visible {
+            display: block;
+        }
+
+        .password-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .auth-container,
+            .main-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="authContainer" class="auth-container">
+        <h1 style="text-align: center; margin-bottom: 30px;">Password Manager</h1>
+
+        <div class="auth-tabs">
+            <button class="tab-btn active" onclick="switchTab('login')">Logowanie</button>
+            <button class="tab-btn" onclick="switchTab('register')">Rejestracja</button>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div id="loginForm">
+            <h2>Zaloguj się</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Hasło:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn">Zaloguj się</button>
+            </form>
+        </div>
+
+        <div id="registerForm" class="hidden">
+            <h2>Zarejestruj się</h2>
+            <form onsubmit="register(event)">
+                <div class="form-group">
+                    <label for="registerEmail">Email:</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Hasło (min. 6 znaków):</label>
+                    <input type="password" id="registerPassword" minlength="6" required>
+                </div>
+                <button type="submit" class="btn">Zarejestruj się</button>
+            </form>
+        </div>
+
+        <div id="authLoading" class="loading">
+            <div class="spinner"></div>
+            <div>Proszę czekać...</div>
+        </div>
+    </div>
+
+    <div id="mainContainer" class="container main-container">
+        <div class="header">
+            <h1>Moje Hasła</h1>
+            <div>
+                <button class="btn btn-success" onclick="togglePasswordForm()">Dodaj Hasło</button>
+                <button class="btn btn-secondary" onclick="logout()">Wyloguj</button>
+            </div>
+        </div>
+
+        <div id="mainAlertContainer"></div>
+
+        <div id="passwordForm" class="password-form">
+            <h3>Dodaj nowe hasło</h3>
+            <form onsubmit="addPassword(event)">
+                <div class="form-group">
+                    <label for="passwordTitle">Tytuł *:</label>
+                    <input type="text" id="passwordTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="passwordDescription">Opis:</label>
+                    <textarea id="passwordDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="passwordValue">Hasło *:</label>
+                    <input type="password" id="passwordValue" required>
+                </div>
+                <div class="form-group">
+                    <label for="passwordWebsite">Strona internetowa:</label>
+                    <input type="url" id="passwordWebsite">
+                </div>
+                <div class="form-group">
+                    <label for="passwordUsername">Nazwa użytkownika:</label>
+                    <input type="text" id="passwordUsername">
+                </div>
+                <button type="submit" class="btn btn-success">Zapisz</button>
+                <button type="button" class="btn btn-secondary" onclick="togglePasswordForm()">Anuluj</button>
+            </form>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input"
+                placeholder="Wyszukaj hasła po tytule, opisie, stronie lub nazwie użytkownika..."
+                oninput="searchPasswords()">
+            <div id="searchResults" class="search-results-info"></div>
+        </div>
+
+        <div id="passwordLoading" class="loading">
+            <div class="spinner"></div>
+            <div>Ładowanie haseł...</div>
+        </div>
+
+        <div id="passwordsList" class="password-grid"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://passwordmanager-api-hfekg5ayfmcmhqhb.eastus2-01.azurewebsites.net/api/';
+        let authToken = localStorage.getItem('authToken');
+        let allPasswords = [];
+
+        function showAlert(container, message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+
+            const alertContainer = document.getElementById(container);
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function showLoading(elementId, show = true) {
+            const element = document.getElementById(elementId);
+            element.style.display = show ? 'block' : 'none';
+        }
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                tabBtns[0].classList.add('active');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                tabBtns[1].classList.add('active');
+            }
+        }
+
+        async function login(event) {
+            event.preventDefault();
+            showLoading('authLoading');
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    showMainApp();
+                    showAlert('mainAlertContainer', 'Zalogowano pomyślnie!');
+                } else {
+                    showAlert('alertContainer', data.message || 'Błąd logowania', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('alertContainer', 'Błąd połączenia z serwerem', 'error');
+            } finally {
+                showLoading('authLoading', false);
+            }
+        }
+
+        async function register(event) {
+            event.preventDefault();
+            showLoading('authLoading');
+
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    showMainApp();
+                    showAlert('mainAlertContainer', 'Konto utworzone pomyślnie!');
+                } else {
+                    showAlert('alertContainer', data.message || 'Błąd rejestracji', 'error');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showAlert('alertContainer', 'Błąd połączenia z serwerem', 'error');
+            } finally {
+                showLoading('authLoading', false);
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('authToken');
+            allPasswords = [];
+            showAuthForm();
+        }
+
+        function showAuthForm() {
+            document.getElementById('authContainer').style.display = 'block';
+            document.getElementById('mainContainer').style.display = 'none';
+        }
+
+        function showMainApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            loadPasswords();
+        }
+
+        function togglePasswordForm() {
+            const form = document.getElementById('passwordForm');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+                form.querySelector('form').reset();
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        async function addPassword(event) {
+            event.preventDefault();
+
+            const passwordData = {
+                title: document.getElementById('passwordTitle').value,
+                description: document.getElementById('passwordDescription').value,
+                password: document.getElementById('passwordValue').value,
+                website: document.getElementById('passwordWebsite').value,
+                username: document.getElementById('passwordUsername').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/passwords`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(passwordData)
+                });
+
+                if (response.ok) {
+                    showAlert('mainAlertContainer', 'Hasło dodane pomyślnie!');
+                    togglePasswordForm();
+                    loadPasswords();
+                } else {
+                    const errorData = await response.json();
+                    showAlert('mainAlertContainer', errorData.message || 'Błąd podczas dodawania hasła', 'error');
+                }
+            } catch (error) {
+                console.error('Add password error:', error);
+                showAlert('mainAlertContainer', 'Błąd połączenia z serwerem', 'error');
+            }
+        }
+
+        async function loadPasswords() {
+            showLoading('passwordLoading');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/passwords`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const passwords = await response.json();
+                    allPasswords = passwords;
+                    displayPasswords(passwords);
+                    updateSearchResults(passwords.length, passwords.length);
+                } else if (response.status === 401) {
+                    logout();
+                } else {
+                    showAlert('mainAlertContainer', 'Błąd podczas ładowania haseł', 'error');
+                }
+            } catch (error) {
+                console.error('Load passwords error:', error);
+                showAlert('mainAlertContainer', 'Błąd połączenia z serwerem', 'error');
+            } finally {
+                showLoading('passwordLoading', false);
+            }
+        }
+
+        function displayPasswords(passwords) {
+            const container = document.getElementById('passwordsList');
+
+            if (passwords.length === 0) {
+                container.innerHTML = '<div class="no-results">Brak haseł do wyświetlenia.</div>';
+                return;
+            }
+
+            container.innerHTML = passwords.map(password => `
+                <div class="password-item" data-password-id="${password.id}">
+                    <div class="password-header">
+                        <div class="password-title">${password.title}</div>
+                        <div class="password-actions">
+                            <button class="btn" id="toggle-btn-${password.id}" onclick="togglePassword(${password.id})">Pokaż</button>
+                            <button class="btn btn-danger" onclick="deletePassword(${password.id})">Usuń</button>
+                        </div>
+                    </div>
+                    <div class="password-details">
+                        ${password.description ? `<div><strong>Opis:</strong> ${password.description}</div>` : ''}
+                        ${password.website ? `<div><strong>Strona:</strong> <a href="${password.website}" target="_blank">${password.website}</a></div>` : ''}
+                        ${password.username ? `<div><strong>Użytkownik:</strong> ${password.username}</div>` : ''}
+                        <div><strong>Utworzono:</strong> ${new Date(password.createdAt).toLocaleDateString('pl-PL')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchPasswords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            if (searchTerm === '') {
+                displayPasswords(allPasswords);
+                updateSearchResults(allPasswords.length, allPasswords.length);
+                return;
+            }
+
+            const filteredPasswords = allPasswords.filter(password => {
+                return (
+                    password.title.toLowerCase().includes(searchTerm) ||
+                    (password.description && password.description.toLowerCase().includes(searchTerm)) ||
+                    (password.website && password.website.toLowerCase().includes(searchTerm)) ||
+                    (password.username && password.username.toLowerCase().includes(searchTerm))
+                );
+            });
+
+            displayPasswords(filteredPasswords);
+            updateSearchResults(filteredPasswords.length, allPasswords.length);
+        }
+
+        function updateSearchResults(filtered, total) {
+            const searchResults = document.getElementById('searchResults');
+            const searchTerm = document.getElementById('searchInput').value.trim();
+
+            if (searchTerm === '') {
+                searchResults.textContent = `Wyświetlanych: ${total} haseł`;
+            } else {
+                searchResults.textContent = `Znaleziono: ${filtered} z ${total} haseł`;
+            }
+        }
+
+        async function togglePassword(id) {
+            const passwordItem = document.querySelector(`[data-password-id="${id}"]`);
+            const toggleBtn = document.getElementById(`toggle-btn-${id}`);
+            const passwordDiv = passwordItem.querySelector('.password-value');
+
+            if (passwordDiv) {
+                passwordDiv.remove();
+                toggleBtn.innerHTML = 'Pokaż';
+            } else {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/passwords/${id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const passwordData = await response.json();
+
+                        const newPasswordDiv = document.createElement('div');
+                        newPasswordDiv.className = 'password-value';
+                        newPasswordDiv.innerHTML = `<strong>Hasło:</strong> ${passwordData.password}`;
+                        passwordItem.appendChild(newPasswordDiv);
+
+                        toggleBtn.innerHTML = 'Ukryj';
+
+                        setTimeout(() => {
+                            if (newPasswordDiv && newPasswordDiv.parentNode) {
+                                newPasswordDiv.remove();
+                                toggleBtn.innerHTML = 'Pokaż';
+                            }
+                        }, 10000);
+                    } else {
+                        if (response.status === 401) {
+                            logout();
+                        } else {
+                            showAlert('mainAlertContainer', 'Błąd podczas pobierania hasła', 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Toggle password error:', error);
+                    showAlert('mainAlertContainer', 'Błąd połączenia z serwerem', 'error');
+                }
+            }
+        }
+
+        async function deletePassword(id) {
+            if (!confirm('Czy na pewno chcesz usunąć to hasło?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/passwords/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    showAlert('mainAlertContainer', 'Hasło zostało usunięte');
+                    loadPasswords();
+                } else {
+                    console.error('Delete failed, status:', response.status);
+                    showAlert('mainAlertContainer', 'Błąd podczas usuwania hasła', 'error');
+                }
+            } catch (error) {
+                console.error('Delete password error:', error);
+                showAlert('mainAlertContainer', 'Błąd połączenia z serwerem', 'error');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            if (authToken) {
+                showMainApp();
+            } else {
+                showAuthForm();
+            }
+        });
+    </script>
+</body>
+
+</html>
