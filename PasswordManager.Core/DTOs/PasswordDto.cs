@@ -26,6 +26,5 @@ namespace PasswordManager.Core.DTOs
         public string Username { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        // Uwaga: Nie zwracamy hasła w response!
     }
 }

@@ -10,22 +10,17 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 
-// Database
 builder.Services.AddDbContext<PasswordManagerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordRepository, PasswordRepository>();
 
-// Services
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<EncryptionService>();
 
-// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -41,7 +36,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -70,33 +64,28 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS - zaktualizowana konfiguracja
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         builder =>
         {
-            builder.WithOrigins("http://localhost:5500", "http://127.0.0.1:8080") // Dodaj porty dla frontendu
+            builder.WithOrigins("http://localhost:5500", "http://127.0.0.1:8080") 
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         });
 });
 
-// Application Insights
 builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
-
-app.UseCors("AllowFrontend"); // Zmień z "AllowAll" na "AllowFrontend"
+app.UseCors("AllowFrontend"); 
 
 app.UseAuthentication();
 app.UseAuthorization();
