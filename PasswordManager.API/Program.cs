@@ -70,13 +70,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS
+// CORS - zaktualizowana konfiguracja
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
+    options.AddPolicy("AllowFrontend",
         builder =>
         {
-            builder.AllowAnyOrigin()
+            builder.WithOrigins("http://localhost:5500", "http://127.0.0.1:8080") // Dodaj porty dla frontendu
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         });
@@ -96,7 +96,7 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend"); // Zmień z "AllowAll" na "AllowFrontend"
 
 app.UseAuthentication();
 app.UseAuthorization();
